@@ -1,0 +1,47 @@
+﻿@page "/personas/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de las Personas</PageTitle>
+
+<h1>Detalles de la Persona</h1>
+
+<div>
+    <hr />
+    @if (persona is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@persona.Nombre</dd>
+            <dt class="col-sm-2">Apellido</dt>
+            <dd class="col-sm-10">@persona.Apellido</dd>
+        </dl>
+        <div>
+            <a href="@($"/personas/edit?id={persona.Id}")">Editar</a> |
+            <a href="@($"/personas")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Persona? persona;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        persona = await context.Personas.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (persona is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

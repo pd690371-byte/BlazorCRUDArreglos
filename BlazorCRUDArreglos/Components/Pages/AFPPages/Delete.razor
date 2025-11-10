@@ -1,0 +1,54 @@
+﻿@page "/afps/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar AFP</PageTitle>
+
+<p>Está seguro que desea eliminar esta AFP?</p>
+
+<div>
+    
+    <hr />
+    @if (afp is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@afp.Nombre</dd>
+        </dl>
+        <EditForm method="post" Model="afp" OnValidSubmit="DeleteAFP" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(afp is null)">Eliminar</button> |
+            <a href="/afps">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private AFP? afp;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        afp = await context.AFP.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (afp is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteAFP()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.AFP.Remove(afp!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/afps");
+    }
+}

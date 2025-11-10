@@ -1,0 +1,84 @@
+﻿@page "/afps/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar AFP</PageTitle>
+
+<h1>Editar AFP</h1>
+
+<hr />
+@if (AFP is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="AFP" OnValidSubmit="UpdateAFP" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="AFP.Id" value="@AFP.Id" />
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre:</label>
+                    <InputText id="nombre" @bind-Value="AFP.Nombre" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => AFP.Nombre" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar</button> | <a href="/afps">Volver al Listado</a>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private AFP? AFP { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        AFP ??= await context.AFP.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (AFP is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateAFP()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(AFP!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AFPExists(AFP!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/afps");
+    }
+
+    private bool AFPExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.AFP.Any(e => e.Id == id);
+    }
+}

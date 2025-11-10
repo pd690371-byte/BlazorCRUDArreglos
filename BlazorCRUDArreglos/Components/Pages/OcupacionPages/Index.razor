@@ -1,0 +1,37 @@
+﻿@page "/ocupacions"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorCRUDArreglos.Modelos
+@using BlazorCRUDArreglos.Modelos
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+
+<PageTitle>Listado de Ocupaciones</PageTitle>
+
+<h1>Listado de Ocupaciones</h1>
+
+<p>
+    <a href="ocupacions/create">Crear Ocupación</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Ocupacion">
+    <PropertyColumn Property="ocupacion => ocupacion.Nombre" />
+    @*<PropertyColumn Property="ocupacion => ocupacion.Inactivo" />*@
+
+    <TemplateColumn Context="ocupacion">
+        <a href="@($"ocupacions/edit?id={ocupacion.Id}")">Editar</a> |
+        <a href="@($"ocupacions/details?id={ocupacion.Id}")">Detalles</a> |
+        <a href="@($"ocupacions/delete?id={ocupacion.Id}")">Eliminar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDBContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

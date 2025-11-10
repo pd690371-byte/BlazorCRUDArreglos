@@ -1,0 +1,36 @@
+﻿@page "/carreras"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorCRUDArreglos.Modelos
+@using BlazorCRUDArreglos.Modelos
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+
+<PageTitle>Listado de Carreras</PageTitle>
+
+<h2>Listado de Carreras</h2>
+
+<p>
+    <a href="carreras/create">Crear Carrera</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Carrera">
+    <PropertyColumn Property="carrera => carrera.Nombre" />
+
+    <TemplateColumn Context="carrera">
+        <a href="@($"carreras/edit?id={carrera.Id}")">Editar</a> |
+        <a href="@($"carreras/details?id={carrera.Id}")">Detalles</a> |
+        <a href="@($"carreras/delete?id={carrera.Id}")">Eliminar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDBContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

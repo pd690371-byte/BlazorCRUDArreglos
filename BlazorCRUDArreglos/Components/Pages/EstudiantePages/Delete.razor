@@ -1,0 +1,133 @@
+﻿@page "/estudiantes/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar Estudiantes</PageTitle>
+
+<p>Está seguro que desea eliminar este Estudiante?</p>
+<div>
+    
+    <hr />
+    @if (estudiante is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Matricula</dt>
+            <dd class="col-sm-10">@estudiante.Matricula</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Cedula</dt>
+            <dd class="col-sm-10">@estudiante.Cedula</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">FechaNacimiento</dt>
+            <dd class="col-sm-10">@estudiante.FechaNacimiento</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">FechaIngreso</dt>
+            <dd class="col-sm-10">@estudiante.FechaIngreso</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@estudiante.Nombre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Apellido</dt>
+            <dd class="col-sm-10">@estudiante.Apellido</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Sexo</dt>
+            <dd class="col-sm-10">@estudiante.Sexo</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">EstadoCivil</dt>
+            <dd class="col-sm-10">@estudiante.EstadoCivil</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TipoSangre</dt>
+            <dd class="col-sm-10">@estudiante.TipoSangre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Nacionalidad</dt>
+            <dd class="col-sm-10">@estudiante.Nacionalidad</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Religion</dt>
+            <dd class="col-sm-10">@estudiante.Religion</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Telefono</dt>
+            <dd class="col-sm-10">@estudiante.Telefono</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@estudiante.Email</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Direccion</dt>
+            <dd class="col-sm-10">@estudiante.Direccion</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">NombrePadre</dt>
+            <dd class="col-sm-10">@estudiante.NombrePadre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">NombreMadre</dt>
+            <dd class="col-sm-10">@estudiante.NombreMadre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TipoColegioEstudios</dt>
+            <dd class="col-sm-10">@estudiante.TipoColegioEstudios</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Carrera</dt>
+            <dd class="col-sm-10">@estudiante.Carrera</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Observaciones</dt>
+            <dd class="col-sm-10">@estudiante.Observaciones</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Ocupacion</dt>
+            <dd class="col-sm-10">@estudiante.Ocupacion</dd>
+        </dl>
+        @*<dl class="row">
+            <dt class="col-sm-2">Inactivo</dt>
+            <dd class="col-sm-10">@estudiante.Inactivo</dd>
+        </dl>*@
+        <EditForm method="post" Model="estudiante" OnValidSubmit="DeleteEstudiante" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(estudiante is null)">Eliminar</button> |
+            <a href="/estudiantes">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Estudiante? estudiante;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        estudiante = await context.Estudiante.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (estudiante is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteEstudiante()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Estudiante.Remove(estudiante!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/estudiantes");
+    }
+}

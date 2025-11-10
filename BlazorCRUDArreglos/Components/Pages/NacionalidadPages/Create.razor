@@ -1,0 +1,39 @@
+﻿@page "/nacionalidads/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Crear Nacionalidades</PageTitle>
+
+<h1>Crear Nacionalidad</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Nacionalidad" OnValidSubmit="AddNacionalidad" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre:</label> 
+                <InputText id="nombre" @bind-Value="Nacionalidad.Nombre" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Nacionalidad.Nombre" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Crear</button> |   <a href="/nacionalidads">Volver al Listado</a>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Nacionalidad Nacionalidad { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddNacionalidad()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Nacionalidad.Add(Nacionalidad);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/nacionalidads");
+    }
+}

@@ -1,0 +1,244 @@
+﻿@page "/estudiantes/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject BlazorCRUDArreglos.Modelos.AppDBContext BD
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar Estudiantes</PageTitle>
+
+<h1>Editar Estudiantes</h1>
+
+<hr />
+@if (Estudiante is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="content">
+            <EditForm method="post" Model="Estudiante" OnValidSubmit="UpdateEstudiante" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Estudiante.Id" value="@Estudiante.Id" />
+                <div class="row">
+                <div class="col-md-3">
+                    <label for="matricula" class="form-label">Matrícula</label>
+                    <InputText id="matricula" @bind-Value="Estudiante.Matricula" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Estudiante.Matricula" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="cedula" class="form-label">Cédula</label>
+                    <InputText id="cedula" @bind-Value="Estudiante.Cedula" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Estudiante.Cedula" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="fechanacimiento" class="form-label">Fecha de Nacimiento</label>
+                    <InputDate id="fechanacimiento" @bind-Value="Estudiante.FechaNacimiento" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.FechaNacimiento" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="fechaingreso" class="form-label">Fecha de Ingreso</label>
+                    <InputDate id="fechaingreso" @bind-Value="Estudiante.FechaIngreso" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.FechaIngreso" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-6">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <InputText id="nombre" @bind-Value="Estudiante.Nombre" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Estudiante.Nombre" class="text-danger" />
+                </div>
+                <div class="col-md-6">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <InputText id="apellido" @bind-Value="Estudiante.Apellido" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Estudiante.Apellido" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-2">
+                    <label for="sexo" class="form-label">Sexo</label>
+                    <InputSelect id="sexo" @bind-Value="Estudiante.Sexo" class="form-control" aria-required="true">
+                        <option checked="@(Estudiante!.Sexo == "Masculino")" value="Masculino">Masculino</option>
+                        <option checked="@(Estudiante!.Sexo == "Femenino")" value="Femenino">Femenino</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.Sexo" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="estadocivil" class="form-label">Estado Civil</label>
+                    <InputSelect id="estadocivil" @bind-Value="Estudiante.EstadoCivil" class="form-control" aria-required="true">
+                        <option checked="@(Estudiante!.EstadoCivil == "Soltero")" value="Soltero">Soltero</option>
+                        <option checked="@(Estudiante!.EstadoCivil == "Casado")" value="Casado">Casado</option>
+                        <option checked="@(Estudiante!.EstadoCivil == "Viudo")" value="Viudo">Viudo</option>
+                        <option checked="@(Estudiante!.EstadoCivil == "Divorciado")" value="Divorciado">Divorciado</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.EstadoCivil" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="tiposangre" class="form-label">Tipo de Sangre</label>
+                    <InputSelect id="tiposangre" @bind-Value="Estudiante.TipoSangre" class="form-control">
+                        <option checked="@(Estudiante!.TipoSangre == "A+")" value="A+">A+</option>
+                        <option checked="@(Estudiante!.TipoSangre == "O-")" value="O-">O-</option>
+                        <option checked="@(Estudiante!.TipoSangre == "AB+")" value="AB+">AB+</option>
+                        <option checked="@(Estudiante!.TipoSangre == "B+")" value="B+">B-</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.TipoSangre" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="nacionalidad" class="form-label">Nacionalidad</label>
+                    <InputSelect id="nacionalidad" @bind-Value="Estudiante.Nacionalidad" class="form-control">
+                        @foreach (var nacionalidad in Nacionalidades)
+                        {
+                            <option value="@nacionalidad.Nombre">@nacionalidad.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.Nacionalidad" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="religion" class="form-label">Religión</label>
+                    <InputSelect id="religion" @bind-Value="Estudiante.Religion" class="form-control">
+                        @foreach (var religion in Religiones)
+                        {
+                            <option value="@religion.Nombre">@religion.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.Religion" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-2">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <InputText id="telefono" @bind-Value="Estudiante.Telefono" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.Telefono" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="email" class="form-label">Email</label>
+                    <InputText id="email" @bind-Value="Estudiante.Email" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.Email" class="text-danger" />
+                </div>
+                <div class="col-md-7">
+                    <label for="direccion" class="form-label">Dirección</label>
+                    <InputText id="direccion" @bind-Value="Estudiante.Direccion" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.Direccion" class="text-danger" />
+                </div>
+                </div>
+                <div class= "row">
+                <div class="col-md-6">
+                    <label for="nombrepadre" class="form-label">Nombre Padre</label>
+                    <InputText id="nombrepadre" @bind-Value="Estudiante.NombrePadre" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.NombrePadre" class="text-danger" />
+                </div>
+                <div class="col-md-6">
+                    <label for="nombremadre" class="form-label">Nombre Madre</label>
+                    <InputText id="nombremadre" @bind-Value="Estudiante.NombreMadre" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.NombreMadre" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-4">
+                    <label for="tipocolegioestudios" class="form-label">Institución de Origen</label>
+                    <InputSelect id="tipocolegioestudios" @bind-Value="Estudiante.TipoColegioEstudios" class="form-control">
+                        <option checked="@(Estudiante!.TipoColegioEstudios == "Publico")" value="Publico">Publico</option>
+                        <option checked="@(Estudiante!.TipoColegioEstudios == "Privado")" value="Privado">Privado</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.TipoColegioEstudios" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <label for="carrera" class="form-label">Carrera</label>
+                    <InputSelect id="carrera" @bind-Value="Estudiante.Carrera" class="form-control">
+                        @foreach (var carrera in Carreras)
+                        {
+                            <option value="@carrera.Nombre">@carrera.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.Carrera" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <label for="ocupacion" class="form-label">Ocupación</label>
+                    <InputSelect id="ocupacion" @bind-Value="Estudiante.Ocupacion" class="form-control">
+                        @foreach (var ocupacion in Ocupaciones)
+                        {
+                            <option value="@ocupacion.Nombre">@ocupacion.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Estudiante.Ocupacion" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <label for="observaciones" class="form-label">Observaciones</label>
+                    <InputTextArea id="observaciones" @bind-Value="Estudiante.Observaciones" class="form-control" />
+                    <ValidationMessage For="() => Estudiante.Observaciones" class="text-danger" />
+                </div>
+                </div>
+                <br>
+                @*<div class="mb-3">
+                    <label for="inactivo" class="form-label">Inactivo:</label>
+                    <InputCheckbox id="inactivo" @bind-Value="Estudiante.Inactivo" class="form-check-input" />
+                    <ValidationMessage For="() => Estudiante.Inactivo" class="text-danger" />
+                </div>*@
+                <button type="submit" class="btn btn-primary">Guardar</button> | <a href="/estudiantes">Volver al Listado</a>
+            </EditForm>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Estudiante? Estudiante { get; set; }
+
+    public List<Carrera> Carreras = new List<Carrera>();
+    public List<Nacionalidad> Nacionalidades = new List<Nacionalidad>();
+    public List<Religion> Religiones = new List<Religion>();
+    public List<Ocupacion> Ocupaciones = new List<Ocupacion>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Estudiante ??= await context.Estudiante.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Estudiante is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+
+        Carreras = BD.Carrera.ToList();
+        Nacionalidades = BD.Nacionalidad.ToList();
+        Religiones = BD.Religion.ToList();
+        Ocupaciones = BD.Ocupacion.ToList();
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEstudiante()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Estudiante!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EstudianteExists(Estudiante!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/estudiantes");
+    }
+
+    private bool EstudianteExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Estudiante.Any(e => e.Id == id);
+    }
+}

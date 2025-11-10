@@ -1,0 +1,54 @@
+﻿@page "/carreras/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar Carreras</PageTitle>
+
+<p>Está seguro que desea eliminar esta Carrera?</p>
+
+<div>
+    
+    <hr />
+    @if (carrera is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@carrera.Nombre</dd>
+        </dl>
+        <EditForm method="post" Model="carrera" OnValidSubmit="DeleteCarrera" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(carrera is null)">Eliminar</button> |
+            <a href="/carreras">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Carrera? carrera;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        carrera = await context.Carrera.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (carrera is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteCarrera()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Carrera.Remove(carrera!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/carreras");
+    }
+}

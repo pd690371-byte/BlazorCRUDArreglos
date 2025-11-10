@@ -1,0 +1,44 @@
+﻿@page "/personas/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Crear Personas</PageTitle>
+
+<h1>Crear Personas</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Persona" OnValidSubmit="AddPersona" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre:</label> 
+                <InputText id="nombre" @bind-Value="Persona.Nombre" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Persona.Nombre" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="apellido" class="form-label">Apellido:</label> 
+                <InputText id="apellido" @bind-Value="Persona.Apellido" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Persona.Apellido" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Crear</button> |  <a href="/personas">Volver al Listado</a>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Persona Persona { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddPersona()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Personas.Add(Persona);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/personas");
+    }
+}

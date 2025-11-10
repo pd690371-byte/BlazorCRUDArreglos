@@ -1,0 +1,48 @@
+﻿@page "/ocupacions/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de las Ocupaciones</PageTitle>
+
+<h1>Detalles de la Ocupación</h1>
+
+<div>
+    
+    <hr />
+    @if (ocupacion is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@ocupacion.Nombre</dd>
+            @*<dt class="col-sm-2">Inactivo</dt>
+            <dd class="col-sm-10">@ocupacion.Inactivo</dd>*@
+        </dl>
+        <div>
+            <a href="@($"/ocupacions/edit?id={ocupacion.Id}")">Editar</a> |
+            <a href="@($"/ocupacions")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Ocupacion? ocupacion;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ocupacion = await context.Ocupacion.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ocupacion is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

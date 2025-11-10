@@ -1,0 +1,56 @@
+﻿@page "/personas/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar Personas</PageTitle>
+
+<p>Está seguro que desea eliminar esta Persona?</p>
+<div>
+    <hr />
+    @if (persona is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@persona.Nombre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Apellido</dt>
+            <dd class="col-sm-10">@persona.Apellido</dd>
+        </dl>
+        <EditForm method="post" Model="persona" OnValidSubmit="DeletePersona" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(persona is null)">Eliminar</button> |
+            <a href="/personas">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Persona? persona;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        persona = await context.Personas.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (persona is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeletePersona()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Personas.Remove(persona!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/personas");
+    }
+}

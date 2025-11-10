@@ -1,0 +1,54 @@
+﻿@page "/gradoacademicos/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar Grados Académicos</PageTitle>
+
+<p>Está seguro que desea eliminar este Grado Académico?</p>
+
+<div>
+   
+    <hr />
+    @if (gradoacademico is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@gradoacademico.Nombre</dd>
+        </dl>
+        <EditForm method="post" Model="gradoacademico" OnValidSubmit="DeleteGradoAcademico" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(gradoacademico is null)">Eliminar</button> |
+            <a href="/gradoacademicos">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private GradoAcademico? gradoacademico;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        gradoacademico = await context.GradosAcademicos.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (gradoacademico is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteGradoAcademico()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.GradosAcademicos.Remove(gradoacademico!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/gradoacademicos");
+    }
+}

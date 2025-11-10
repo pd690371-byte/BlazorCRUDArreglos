@@ -1,0 +1,64 @@
+﻿@page "/estudiantes"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorCRUDArreglos.Modelos
+@using BlazorCRUDArreglos.Modelos
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+
+<PageTitle>Listado de Estudiantes</PageTitle>
+
+<h1>Listado de Estudiantes</h1>
+
+<p>
+    <a href="estudiantes/create">Crear Estudiante</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Estudiante">
+    <PropertyColumn Property="estudiante => estudiante.Matricula" Sortable="true" Title="Matrícula" />
+    <PropertyColumn Property="estudiante => estudiante.Cedula" Sortable="true" Title="Cédula" />
+    <PropertyColumn Property="estudiante => estudiante.Nombre" />
+    <PropertyColumn Property="estudiante => estudiante.Apellido" />
+    <PropertyColumn Property="estudiante => estudiante.Telefono" Sortable="true" Title="Teléfono" />
+    <PropertyColumn Property="estudiante => estudiante.Carrera" />
+    @*<PropertyColumn Property="estudiante => estudiante.FechaNacimiento" />
+    <PropertyColumn Property="estudiante => estudiante.FechaIngreso" />
+    <PropertyColumn Property="estudiante => estudiante.Sexo" />
+    <PropertyColumn Property="estudiante => estudiante.EstadoCivil" />
+    <PropertyColumn Property="estudiante => estudiante.TipoSangre" />
+    <PropertyColumn Property="estudiante => estudiante.Nacionalidad" />
+    <PropertyColumn Property="estudiante => estudiante.Religion" Sortable="true" Title="Religión" />
+    <PropertyColumn Property="estudiante => estudiante.Email" />
+    <PropertyColumn Property="estudiante => estudiante.Direccion" Sortable="true" Title="Dirección" />
+    <PropertyColumn Property="estudiante => estudiante.NombrePadre" />
+    <PropertyColumn Property="estudiante => estudiante.NombreMadre" />
+    <PropertyColumn Property="estudiante => estudiante.TipoColegioEstudios" />
+    <PropertyColumn Property="estudiante => estudiante.Observaciones" />
+    <PropertyColumn Property="estudiante => estudiante.Ocupacion" Sortable="true" Title="Ocupación" />
+    <PropertyColumn Property="estudiante => estudiante.Inactivo" />*@
+
+    <TemplateColumn Context="estudiante">
+        <a href="@($"estudiantes/edit?id={estudiante.Id}")">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+
+        <a href="@($"estudiantes/details?id={estudiante.Id}")">
+            <i class="fa-solid fa-circle-info"></i>
+        </a>
+
+        <a href="@($"estudiantes/delete?id={estudiante.Id}")">
+            <i class="fa-solid fa-trash" style="color:red;"></i>
+        </a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDBContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

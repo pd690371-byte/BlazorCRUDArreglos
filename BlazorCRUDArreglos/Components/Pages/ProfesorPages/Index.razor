@@ -1,0 +1,68 @@
+﻿@page "/profesors"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorCRUDArreglos.Modelos
+@using BlazorCRUDArreglos.Modelos
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+
+<PageTitle>Listado de Profesores</PageTitle>
+
+<h1>Listado de Profesores</h1>
+
+<p>
+    <a class="btn btn-warning" href="profesors/create">
+        <i class="fa-solid fa-plus"></i>
+        Crear Profesor
+    </a>
+</p>
+
+<QuickGrid Class="table" Items="context.Profesor">
+    <PropertyColumn Property="profesor => profesor.Codigo" Sortable="true" Title="Código" />
+    <PropertyColumn Property="profesor => profesor.Cedula" Sortable="true" Title="Cédula" />
+    <PropertyColumn Property="profesor => profesor.FechaNacimiento" />
+    <PropertyColumn Property="profesor => profesor.FechaIngreso" />
+    <PropertyColumn Property="profesor => profesor.Nombre" />
+    <PropertyColumn Property="profesor => profesor.Apellido" />
+    <PropertyColumn Property="profesor => profesor.Sexo" />
+    <PropertyColumn Property="profesor => profesor.EstadoCivil" />
+    <PropertyColumn Property="profesor => profesor.Ocupacion" Sortable="true" Title="Ocupación" />
+    <PropertyColumn Property="profesor => profesor.TipoSangre" />
+    <PropertyColumn Property="profesor => profesor.Nacionalidad" />
+    <PropertyColumn Property="profesor => profesor.Religion" Sortable="true" Title="Religión" />
+    <PropertyColumn Property="profesor => profesor.Telefono" Sortable="true" Title="Teléfono" />
+    <PropertyColumn Property="profesor => profesor.Email" />
+    <PropertyColumn Property="profesor => profesor.Direccion" Sortable="true" Title="Dirección" />
+    <PropertyColumn Property="profesor => profesor.Facultad" />
+    <PropertyColumn Property="profesor => profesor.TituloCarreraGrado" />
+    <PropertyColumn Property="profesor => profesor.GradoAlcanzado" />
+    <PropertyColumn Property="profesor => profesor.CategoriaProfesoral" />
+    <PropertyColumn Property="profesor => profesor.FacultadPertenece" />
+    <PropertyColumn Property="profesor => profesor.Observaciones" />
+    @*<PropertyColumn Property="profesor => profesor.Inactivo" />*@
+
+    <TemplateColumn Context="profesor">
+        <a href="@($"profesors/edit?id={profesor.Id}")">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+
+        <a href="@($"profesors/details?id={profesor.Id}")">
+            <i class="fa-solid fa-circle-info"></i>
+        </a>
+
+        <a href="@($"profesors/delete?id={profesor.Id}")">
+            <i class="fa-solid fa-trash" style="color:red;"></i>
+        </a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDBContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

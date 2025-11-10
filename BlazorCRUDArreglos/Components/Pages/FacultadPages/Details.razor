@@ -1,0 +1,46 @@
+﻿@page "/facultads/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de las Facultades</PageTitle>
+
+<h1>Detalles de la Facultad</h1>
+
+<div>
+    
+    <hr />
+    @if (facultad is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@facultad.Nombre</dd>
+        </dl>
+        <div>
+            <a href="@($"/facultads/edit?id={facultad.Id}")">Editar</a> |
+            <a href="@($"/facultads")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Facultad? facultad;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        facultad = await context.Facultades.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (facultad is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,46 @@
+﻿@page "/ars/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de la ARS</PageTitle>
+
+<h1>Detalles de la ARS</h1>
+
+<div>
+    
+    <hr />
+    @if (ars is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@ars.Nombre</dd>
+        </dl>
+        <div>
+            <a href="@($"/ars/edit?id={ars.Id}")">Editar</a> |
+            <a href="@($"/ars")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private ARS? ars;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ars = await context.ARS.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ars is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,46 @@
+﻿@page "/nacionalidads/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de las Nacionalidades</PageTitle>
+
+<h1>Detalles de la Nacionalidad</h1>
+
+<div>
+    
+    <hr />
+    @if (nacionalidad is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@nacionalidad.Nombre</dd>
+        </dl>
+        <div>
+            <a href="@($"/nacionalidads/edit?id={nacionalidad.Id}")">Editar</a> |
+            <a href="@($"/nacionalidads")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Nacionalidad? nacionalidad;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        nacionalidad = await context.Nacionalidad.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (nacionalidad is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

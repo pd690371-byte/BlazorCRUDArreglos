@@ -1,0 +1,138 @@
+﻿@page "/empleados/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar Empleados</PageTitle>
+
+<p>Está seguro que desea eliminar este Empleado?</p>
+
+<div>
+    
+    <hr />
+    @if (empleado is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Codigo</dt>
+            <dd class="col-sm-10">@empleado.Codigo</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Cedula</dt>
+            <dd class="col-sm-10">@empleado.Cedula</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">FechaNacimiento</dt>
+            <dd class="col-sm-10">@empleado.FechaNacimiento</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">FechaIngreso</dt>
+            <dd class="col-sm-10">@empleado.FechaIngreso</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@empleado.Nombre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Apellido</dt>
+            <dd class="col-sm-10">@empleado.Apellido</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Sexo</dt>
+            <dd class="col-sm-10">@empleado.Sexo</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">EstadoCivil</dt>
+            <dd class="col-sm-10">@empleado.EstadoCivil</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TipoSangre</dt>
+            <dd class="col-sm-10">@empleado.TipoSangre</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Nacionalidad</dt>
+            <dd class="col-sm-10">@empleado.Nacionalidad</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Religion</dt>
+            <dd class="col-sm-10">@empleado.Religion</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Telefono</dt>
+            <dd class="col-sm-10">@empleado.Telefono</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@empleado.Email</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Direccion</dt>
+            <dd class="col-sm-10">@empleado.Direccion</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">SalarioMensual</dt>
+            <dd class="col-sm-10">@empleado.SalarioMensual</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DepartamentoPertenece</dt>
+            <dd class="col-sm-10">@empleado.DepartamentoPertenece</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">NombreEmergencia</dt>
+            <dd class="col-sm-10">@empleado.NombreEmergencia</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">TelefonoEmergencia</dt>
+            <dd class="col-sm-10">@empleado.TelefonoEmergencia</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AFPPertenece</dt>
+            <dd class="col-sm-10">@empleado.AFPPertenece</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ARSPertenece</dt>
+            <dd class="col-sm-10">@empleado.ARSPertenece</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Observaciones</dt>
+            <dd class="col-sm-10">@empleado.Observaciones</dd>
+        </dl>
+        @*<dl class="row">
+            <dt class="col-sm-2">Inactivo</dt>
+            <dd class="col-sm-10">@empleado.Inactivo</dd>
+        </dl>*@
+        <EditForm method="post" Model="empleado" OnValidSubmit="DeleteEmpleado" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(empleado is null)">Eliminar</button> |
+            <a href="/empleados">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Empleado? empleado;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        empleado = await context.Empleado.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (empleado is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteEmpleado()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Empleado.Remove(empleado!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/empleados");
+    }
+}

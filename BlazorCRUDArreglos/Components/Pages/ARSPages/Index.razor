@@ -1,0 +1,36 @@
+﻿@page "/ars"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorCRUDArreglos.Modelos
+@using BlazorCRUDArreglos.Modelos
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+
+<PageTitle>Listado de ARS</PageTitle>
+
+<h1>Listado de ARS</h1>
+
+<p>
+    <a href="ars/create">Crear ARS</a>
+</p>
+
+<QuickGrid Class="table" Items="context.ARS">
+    <PropertyColumn Property="ars => ars.Nombre" />
+
+    <TemplateColumn Context="ars">
+        <a href="@($"ars/edit?id={ars.Id}")">Editar</a> |
+        <a href="@($"ars/details?id={ars.Id}")">Detalles</a> |
+        <a href="@($"ars/delete?id={ars.Id}")">Eliminar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDBContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

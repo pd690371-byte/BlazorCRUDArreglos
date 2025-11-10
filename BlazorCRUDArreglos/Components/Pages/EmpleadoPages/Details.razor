@@ -1,0 +1,88 @@
+﻿@page "/empleados/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de los Empleados</PageTitle>
+
+<h1>Detalles del Empleado</h1>
+
+<div>
+    
+    <hr />
+    @if (empleado is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Código</dt>
+            <dd class="col-sm-10">@empleado.Codigo</dd>
+            <dt class="col-sm-2">Cédula</dt>
+            <dd class="col-sm-10">@empleado.Cedula</dd>
+            <dt class="col-sm-2">Fecha de Nacimiento</dt>
+            <dd class="col-sm-10">@empleado.FechaNacimiento</dd>
+            <dt class="col-sm-2">Fecha de Ingreso</dt>
+            <dd class="col-sm-10">@empleado.FechaIngreso</dd>
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@empleado.Nombre</dd>
+            <dt class="col-sm-2">Apellido</dt>
+            <dd class="col-sm-10">@empleado.Apellido</dd>
+            <dt class="col-sm-2">Sexo</dt>
+            <dd class="col-sm-10">@empleado.Sexo</dd>
+            <dt class="col-sm-2">Estado Civil</dt>
+            <dd class="col-sm-10">@empleado.EstadoCivil</dd>
+            <dt class="col-sm-2">Tipo de Sangre</dt>
+            <dd class="col-sm-10">@empleado.TipoSangre</dd>
+            <dt class="col-sm-2">Nacionalidad</dt>
+            <dd class="col-sm-10">@empleado.Nacionalidad</dd>
+            <dt class="col-sm-2">Religión</dt>
+            <dd class="col-sm-10">@empleado.Religion</dd>
+            <dt class="col-sm-2">Teléfono</dt>
+            <dd class="col-sm-10">@empleado.Telefono</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@empleado.Email</dd>
+            <dt class="col-sm-2">Dirección</dt>
+            <dd class="col-sm-10">@empleado.Direccion</dd>
+            <dt class="col-sm-2">Salario Mensual</dt>
+            <dd class="col-sm-10">@empleado.SalarioMensual</dd>
+            <dt class="col-sm-2">Departamento al que Pertenece</dt>
+            <dd class="col-sm-10">@empleado.DepartamentoPertenece</dd>
+            <dt class="col-sm-2">Nombre de Emergencia</dt>
+            <dd class="col-sm-10">@empleado.NombreEmergencia</dd>
+            <dt class="col-sm-2">Teléfono de Emergencia</dt>
+            <dd class="col-sm-10">@empleado.TelefonoEmergencia</dd>
+            <dt class="col-sm-2">AFP que Pertenece</dt>
+            <dd class="col-sm-10">@empleado.AFPPertenece</dd>
+            <dt class="col-sm-2">ARS que Pertenece</dt>
+            <dd class="col-sm-10">@empleado.ARSPertenece</dd>
+            <dt class="col-sm-2">Observaciones</dt>
+            <dd class="col-sm-10">@empleado.Observaciones</dd>
+            @*<dt class="col-sm-2">Inactivo</dt>
+            <dd class="col-sm-10">@empleado.Inactivo</dd>*@
+        </dl>
+        <div>
+            <a href="@($"/empleados/edit?id={empleado.Id}")">Editar</a> |
+            <a href="@($"/empleados")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Empleado? empleado;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        empleado = await context.Empleado.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (empleado is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

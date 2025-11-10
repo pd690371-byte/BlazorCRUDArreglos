@@ -1,0 +1,86 @@
+﻿@page "/estudiantes/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de los Estudiantes</PageTitle>
+
+<h1>Detalles del Estudiante</h1>
+
+<div>
+    
+    <hr />
+    @if (estudiante is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Matrícula</dt>
+            <dd class="col-sm-10">@estudiante.Matricula</dd>
+            <dt class="col-sm-2">Cédula</dt>
+            <dd class="col-sm-10">@estudiante.Cedula</dd>
+            <dt class="col-sm-2">Fecha de Nacimiento</dt>
+            <dd class="col-sm-10">@estudiante.FechaNacimiento</dd>
+            <dt class="col-sm-2">Fecha de Ingreso</dt>
+            <dd class="col-sm-10">@estudiante.FechaIngreso</dd>
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@estudiante.Nombre</dd>
+            <dt class="col-sm-2">Apellido</dt>
+            <dd class="col-sm-10">@estudiante.Apellido</dd>
+            <dt class="col-sm-2">Sexo</dt>
+            <dd class="col-sm-10">@estudiante.Sexo</dd>
+            <dt class="col-sm-2">Estado Civil</dt>
+            <dd class="col-sm-10">@estudiante.EstadoCivil</dd>
+            <dt class="col-sm-2">Tipo de Sangre</dt>
+            <dd class="col-sm-10">@estudiante.TipoSangre</dd>
+            <dt class="col-sm-2">Nacionalidad</dt>
+            <dd class="col-sm-10">@estudiante.Nacionalidad</dd>
+            <dt class="col-sm-2">Religión</dt>
+            <dd class="col-sm-10">@estudiante.Religion</dd>
+            <dt class="col-sm-2">Teléfono</dt>
+            <dd class="col-sm-10">@estudiante.Telefono</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@estudiante.Email</dd>
+            <dt class="col-sm-2">Dirección</dt>
+            <dd class="col-sm-10">@estudiante.Direccion</dd>
+            <dt class="col-sm-2">Nombre Padre</dt>
+            <dd class="col-sm-10">@estudiante.NombrePadre</dd>
+            <dt class="col-sm-2">Nombre Madre</dt>
+            <dd class="col-sm-10">@estudiante.NombreMadre</dd>
+            <dt class="col-sm-2">Tipo Colegio de Estudios</dt>
+            <dd class="col-sm-10">@estudiante.TipoColegioEstudios</dd>
+            <dt class="col-sm-2">Carrera</dt>
+            <dd class="col-sm-10">@estudiante.Carrera</dd>
+            <dt class="col-sm-2">Observaciones</dt>
+            <dd class="col-sm-10">@estudiante.Observaciones</dd>
+            <dt class="col-sm-2">Ocupación</dt>
+            <dd class="col-sm-10">@estudiante.Ocupacion</dd>
+            @*<dt class="col-sm-2">Inactivo</dt>
+            <dd class="col-sm-10">@estudiante.Inactivo</dd>*@
+        </dl>
+        <div>
+            <a href="@($"/estudiantes/edit?id={estudiante.Id}")">Editar</a> |
+            <a href="@($"/estudiantes")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Estudiante? estudiante;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        estudiante = await context.Estudiante.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (estudiante is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

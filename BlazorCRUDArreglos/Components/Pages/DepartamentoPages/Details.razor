@@ -1,0 +1,46 @@
+﻿@page "/departamentos/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de los Departamentos</PageTitle>
+
+<h1>Detalles del Departamento</h1>
+
+<div>
+    
+    <hr />
+    @if (departamento is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@departamento.Nombre</dd>
+        </dl>
+        <div>
+            <a href="@($"/departamentos/edit?id={departamento.Id}")">Editar</a> |
+            <a href="@($"/departamentos")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Departamento? departamento;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        departamento = await context.Departamentos.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (departamento is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

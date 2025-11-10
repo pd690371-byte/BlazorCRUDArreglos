@@ -1,0 +1,46 @@
+﻿@page "/gradoacademicos/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Detalles de los Grados Académicos</PageTitle>
+
+<h1>Detalles del Grado Académico</h1>
+
+<div>
+   
+    <hr />
+    @if (gradoacademico is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@gradoacademico.Nombre</dd>
+        </dl>
+        <div>
+            <a href="@($"/gradoacademicos/edit?id={gradoacademico.Id}")">Editar</a> |
+            <a href="@($"/gradoacademicos")">Volver al Listado</a>
+        </div>
+    }
+</div>
+
+@code {
+    private GradoAcademico? gradoacademico;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        gradoacademico = await context.GradosAcademicos.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (gradoacademico is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

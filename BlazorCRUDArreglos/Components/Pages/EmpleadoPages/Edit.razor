@@ -1,0 +1,252 @@
+﻿@page "/empleados/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar Empleados</PageTitle>
+
+<h1>Editar Empleado</h1>
+
+<hr />
+@if (Empleado is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="content">
+            <EditForm method="post" Model="Empleado" OnValidSubmit="UpdateEmpleado" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Empleado.Id" value="@Empleado.Id" />
+               <div class="row">
+            <div class="col-md-3">
+                    <label for="codigo" class="form-label">Código</label>
+                    <InputText id="codigo" @bind-Value="Empleado.Codigo" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Empleado.Codigo" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="cedula" class="form-label">Cédula</label>
+                    <InputText id="cedula" @bind-Value="Empleado.Cedula" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Empleado.Cedula" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="fechanacimiento" class="form-label">Fecha de Nacimiento</label>
+                    <InputDate id="fechanacimiento" @bind-Value="Empleado.FechaNacimiento" class="form-control" />
+                    <ValidationMessage For="() => Empleado.FechaNacimiento" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="fechaingreso" class="form-label">Fecha de Ingreso</label>
+                    <InputDate id="fechaingreso" @bind-Value="Empleado.FechaIngreso" class="form-control" />
+                    <ValidationMessage For="() => Empleado.FechaIngreso" class="text-danger" />
+                </div>
+                </div>
+               <div class="row">
+            <div class="col-md-6">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <InputText id="nombre" @bind-Value="Empleado.Nombre" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Empleado.Nombre" class="text-danger" />
+                </div>
+                <div class="col-md-6">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <InputText id="apellido" @bind-Value="Empleado.Apellido" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Empleado.Apellido" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+            <div class="col-md-2">
+                    <label for="sexo" class="form-label">Sexo</label>
+                    <InputSelect id="sexo" @bind-Value="Empleado.Sexo" class="form-control" aria-required="true">
+                        <option checked="@(Empleado!.Sexo == "Masculino")" value="Masculino">Masculino</option>
+                        <option checked="@(Empleado!.Sexo == "Femenino")" value="Femenino">Femenino</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.Sexo" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="estadocivil" class="form-label">Estado Civil</label>
+                    <InputSelect id="estadocivil" @bind-Value="Empleado.EstadoCivil" class="form-control" aria-required="true">
+                        <option checked="@(Empleado!.EstadoCivil == "Soltero")" value="Soltero">Soltero</option>
+                        <option checked="@(Empleado!.EstadoCivil == "Casado")" value="Casado">Casado</option>
+                        <option checked="@(Empleado!.EstadoCivil == "Viudo")" value="Viudo">Viudo</option>
+                        <option checked="@(Empleado!.EstadoCivil == "Divorciado")" value="Divorciado">Divorciado</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.EstadoCivil" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="tiposangre" class="form-label">Tipo de Sangre</label>
+                    <InputSelect id="tiposangre" @bind-Value="Empleado.TipoSangre" class="form-control">
+                        <option checked="@(Empleado!.TipoSangre == "A+")" value="A+">A+</option>
+                        <option checked="@(Empleado!.TipoSangre == "O-")" value="O-">O-</option>
+                        <option checked="@(Empleado!.TipoSangre == "AB+")" value="AB+">AB+</option>
+                        <option checked="@(Empleado!.TipoSangre == "B+")" value="B+">B-</option>
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.TipoSangre" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="nacionalidad" class="form-label">Nacionalidad</label>
+                    <InputSelect id="nacionalidad" @bind-Value="Empleado.Nacionalidad" class="form-control">
+                        @foreach (var nacionalidad in Nacionalidades)
+                        {
+                            <option value="@nacionalidad.Nombre">@nacionalidad.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.Nacionalidad" class="text-danger" />
+                </div>
+                <div class="col-md-2">
+                    <label for="religion" class="form-label">Religión</label>
+                    <InputSelect id="religion" @bind-Value="Empleado.Religion" class="form-control">
+                        @foreach (var religion in Religiones)
+                        {
+                            <option value="@religion.Nombre">@religion.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.Religion" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+            <div class="col-md-2">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <InputText id="telefono" @bind-Value="Empleado.Telefono" class="form-control" />
+                    <ValidationMessage For="() => Empleado.Telefono" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="email" class="form-label">Email</label>
+                    <InputText id="email" @bind-Value="Empleado.Email" class="form-control" />
+                    <ValidationMessage For="() => Empleado.Email" class="text-danger" />
+                </div>
+                <div class="col-md-7">
+                    <label for="direccion" class="form-label">Dirección</label>
+                    <InputText id="direccion" @bind-Value="Empleado.Direccion" class="form-control" />
+                    <ValidationMessage For="() => Empleado.Direccion" class="text-danger" />
+                </div>
+                </div>
+               <div class="row">
+            <div class="col-md-2">
+                    <label for="salariomensual" class="form-label">Salario Mensual</label>
+                    <InputText id="salariomensual" @bind-Value="Empleado.SalarioMensual" class="form-control" />
+                    <ValidationMessage For="() => Empleado.SalarioMensual" class="text-danger" />
+                </div>
+                <div class="col-md-3">
+                    <label for="nombreemergencia" class="form-label">Nombre de Emergencia</label>
+                    <InputText id="nombreemergencia" @bind-Value="Empleado.NombreEmergencia" class="form-control" />
+                    <ValidationMessage For="() => Empleado.NombreEmergencia" class="text-danger" />
+                </div>
+               <div class="col-md-3">
+                    <label for="telefonoemergencia" class="form-label">Teléfono de Emergencia</label>
+                    <InputText id="telefonoemergencia" @bind-Value="Empleado.TelefonoEmergencia" class="form-control" />
+                    <ValidationMessage For="() => Empleado.TelefonoEmergencia" class="text-danger" />
+                </div>
+                </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="departamentopertenece" class="form-label">Departamento al que Pertenece</label>
+                    <InputSelect id="departamentopertenece" @bind-Value="Empleado.DepartamentoPertenece" class="form-control">
+                        @foreach (var departamento in Departamentos)
+                        {
+                            <option value="@departamento.Nombre">@departamento.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.DepartamentoPertenece" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <label for="afppertenece" class="form-label">AFP que Pertenece</label>
+                    <InputSelect id="afppertenece" @bind-Value="Empleado.AFPPertenece" class="form-control">
+                        @foreach (var AFP in AFP)
+                        {
+                            <option value="@AFP.Nombre">@AFP.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.AFPPertenece" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <label for="arspertenece" class="form-label">ARS que Pertenece</label>
+                    <InputSelect id="arspertenece" @bind-Value="Empleado.ARSPertenece" class="form-control">
+                        @foreach (var ARS in ARS)
+                        {
+                            <option value="@ARS.Nombre">@ARS.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Empleado.ARSPertenece" class="text-danger" />
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <label for="observaciones" class="form-label">Observaciones</label>
+                    <InputTextArea id="observaciones" @bind-Value="Empleado.Observaciones" class="form-control" />
+                    <ValidationMessage For="() => Empleado.Observaciones" class="text-danger" />
+                </div>
+            </div>
+            <br>
+                @*<div class="mb-3">
+                    <label for="inactivo" class="form-label">Inactivo:</label>
+                    <InputCheckbox id="inactivo" @bind-Value="Empleado.Inactivo" class="form-check-input" />
+                    <ValidationMessage For="() => Empleado.Inactivo" class="text-danger" />
+                </div>*@
+                <button type="submit" class="btn btn-primary">Guardar</button> | <a href="/empleados">Volver al Listado</a>
+            </EditForm>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Empleado? Empleado { get; set; }
+
+    public List<Nacionalidad> Nacionalidades = new List<Nacionalidad>();
+    public List<Religion> Religiones = new List<Religion>();
+    public List<Departamento> Departamentos = new List<Departamento>();
+    public List<AFP> AFP = new List<AFP>();
+    public List<ARS> ARS = new List<ARS>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Empleado ??= await context.Empleado.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Empleado is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+
+        Nacionalidades = BD.Nacionalidad.ToList();
+        Religiones = BD.Religion.ToList();
+        Departamentos = BD.Departamentos.ToList();
+        AFP = BD.AFP.ToList();
+        ARS = BD.ARS.ToList();
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEmpleado()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Empleado!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EmpleadoExists(Empleado!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/empleados");
+    }
+
+    private bool EmpleadoExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Empleado.Any(e => e.Id == id);
+    }
+}

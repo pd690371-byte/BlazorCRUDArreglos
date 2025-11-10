@@ -1,0 +1,37 @@
+﻿@page "/personas"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorCRUDArreglos.Modelos
+@using BlazorCRUDArreglos.Modelos
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+
+<PageTitle>Listado de Personas</PageTitle>
+
+<h1>Listado de Personas</h1>
+
+<p>
+    <a href="personas/create">Crear Persona</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Personas">
+    <PropertyColumn Property="persona => persona.Nombre" />
+    <PropertyColumn Property="persona => persona.Apellido" />
+
+    <TemplateColumn Context="persona">
+        <a href="@($"personas/edit?id={persona.Id}")">Editar</a> |
+        <a href="@($"personas/details?id={persona.Id}")">Detalles</a> |
+        <a href="@($"personas/delete?id={persona.Id}")">Eliminar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDBContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

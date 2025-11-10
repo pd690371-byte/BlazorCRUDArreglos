@@ -1,0 +1,208 @@
+﻿@page "/empleados/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Crear Empleados</PageTitle>
+
+<h1>Crear Empleados</h1>
+
+<hr />
+<div class="content">
+        <EditForm method="post" Model="Empleado" OnValidSubmit="AddEmpleado" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+           <div class="row">
+            <div class="col-md-3">
+                <label for="codigo" class="form-label">Código</label> 
+                <InputText id="codigo" @bind-Value="Empleado.Codigo" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Empleado.Codigo" class="text-danger" /> 
+            </div>
+            <div class="col-md-3">
+                <label for="cedula" class="form-label">Cédula</label> 
+                <InputText id="cedula" @bind-Value="Empleado.Cedula" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Empleado.Cedula" class="text-danger" /> 
+            </div>        
+            <div class="col-md-3">
+                <label for="fechanacimiento" class="form-label">Fecha de Nacimiento</label> 
+                <InputDate id="fechanacimiento" @bind-Value="Empleado.FechaNacimiento" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.FechaNacimiento" class="text-danger" /> 
+            </div>
+            <div class="col-md-3">
+                <label for="fechaingreso" class="form-label">Fecha de Ingreso</label> 
+                <InputDate id="fechaingreso" @bind-Value="Empleado.FechaIngreso" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.FechaIngreso" class="text-danger" /> 
+            </div>        
+            </div>
+            <div class="row">
+            <div class="col-md-6">
+                <label for="nombre" class="form-label">Nombre</label> 
+                <InputText id="nombre" @bind-Value="Empleado.Nombre" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Empleado.Nombre" class="text-danger" /> 
+            </div>        
+            <div class="col-md-6">
+                <label for="apellido" class="form-label">Apellido</label> 
+                <InputText id="apellido" @bind-Value="Empleado.Apellido" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Empleado.Apellido" class="text-danger" /> 
+            </div>       
+            </div>
+             <div class="row">
+            <div class="col-md-2">
+                <label for="sexo" class="form-label">Sexo</label> 
+               <InputSelect id="sexo" @bind-Value="Empleado.Sexo" class="form-control" aria-required="true">
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    </InputSelect>
+                <ValidationMessage For="() => Empleado.Sexo" class="text-danger" /> 
+            </div>
+            <div class="col-md-2">
+                <label for="estadocivil" class="form-label">Estado Civil</label> 
+                <InputSelect id="estadocivil" @bind-Value="Empleado.EstadoCivil" class="form-control" aria-required="true">
+                    <option value="Soltero">Soltero</option>
+                    <option value="Casado">Casado</option>
+                    <option value="Viudo">Viudo</option>
+                    <option value="Divorciado">Divorciado</option>
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.EstadoCivil" class="text-danger" /> 
+            </div>
+            <div class="col-md-2">
+                <label for="tiposangre" class="form-label">Tipo de Sangre</label> 
+                <InputSelect id="tiposangre" @bind-Value="Empleado.TipoSangre" class="form-control">
+                    <option value="A+">A+</option>
+                    <option value="O-">O-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="B+">B-</option>
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.TipoSangre" class="text-danger" /> 
+            </div>        
+            <div class="col-md-2">
+                <label for="nacionalidad" class="form-label">Nacionalidad</label> 
+                <InputSelect id="nacionalidad" @bind-Value="Empleado.Nacionalidad" class="form-control">
+                    @foreach (var nacionalidad in Nacionalidades)
+                    {
+                        <option value="@nacionalidad.Nombre">@nacionalidad.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.Nacionalidad" class="text-danger" /> 
+            </div>        
+             <div class="col-md-2">
+                <label for="religion" class="form-label">Religión</label> 
+                <InputSelect id="religion" @bind-Value="Empleado.Religion" class="form-control">
+                    @foreach (var religion in Religiones)
+                    {
+                        <option value="@religion.Nombre">@religion.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.Religion" class="text-danger" /> 
+            </div>     
+            </div>
+          <div class="row">
+            <div class="col-md-2">
+                <label for="telefono" class="form-label">Teléfono</label> 
+                <InputText id="telefono" @bind-Value="Empleado.Telefono" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.Telefono" class="text-danger" /> 
+            </div>
+            <div class="col-md-3">
+                <label for="email" class="form-label">Email</label> 
+                <InputText id="email" @bind-Value="Empleado.Email" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.Email" class="text-danger" /> 
+            </div>        
+            <div class="col-md-7">
+                <label for="direccion" class="form-label">Dirección</label> 
+                <InputText id="direccion" @bind-Value="Empleado.Direccion" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.Direccion" class="text-danger" /> 
+            </div>        
+            </div>
+             <div class="row">
+            <div class="col-md-2">
+                <label for="salariomensual" class="form-label">Salario Mensual</label> 
+                <InputText id="salariomensual" @bind-Value="Empleado.SalarioMensual" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.SalarioMensual" class="text-danger" /> 
+            </div>
+            <div class="col-md-3">
+            <label for="nombreemergencia" class="form-label">Nombre de Emergencia</label>
+            <InputText id="nombreemergencia" @bind-Value="Empleado.NombreEmergencia" class="form-control" />
+            <ValidationMessage For="() => Empleado.NombreEmergencia" class="text-danger" />
+        </div>
+       <div class="col-md-7">
+            <label for="telefonoemergencia" class="form-label">Teléfono de Emergencia</label>
+            <InputText id="telefonoemergencia" @bind-Value="Empleado.TelefonoEmergencia" class="form-control" />
+            <ValidationMessage For="() => Empleado.TelefonoEmergencia" class="text-danger" />
+        </div>
+        </div>
+         <div class="row">
+            <div class="col-md-4">
+                <label for="departamentopertenece" class="form-label">Departamento  al que Pertenece</label> 
+                <InputSelect id="departamentopertenece" @bind-Value="Empleado.DepartamentoPertenece" class="form-control">
+                    @foreach (var departamento in Departamentos)
+                    {
+                        <option value="@departamento.Nombre">@departamento.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.DepartamentoPertenece" class="text-danger" /> 
+            </div>
+            <div class="col-md-4">
+                <label for="afppertenece" class="form-label">AFP que Pertenece</label> 
+                <InputSelect id="afppertenece" @bind-Value="Empleado.AFPPertenece" class="form-control">
+                    @foreach (var AFP in AFP)
+                    {
+                        <option value="@AFP.Nombre">@AFP.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.AFPPertenece" class="text-danger" /> 
+            </div>
+            <div class="col-md-4">
+                <label for="arspertenece" class="form-label">ARS que Pertenece</label> 
+                <InputSelect id="arspertenece" @bind-Value="Empleado.ARSPertenece" class="form-control">
+                    @foreach (var ARS in ARS)
+                    {
+                        <option value="@ARS.Nombre">@ARS.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Empleado.ARSPertenece" class="text-danger" /> 
+            </div>     
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                <label for="observaciones" class="form-label">Observaciones</label> 
+                <InputTextArea id="observaciones" @bind-Value="Empleado.Observaciones" class="form-control" /> 
+                <ValidationMessage For="() => Empleado.Observaciones" class="text-danger" /> 
+            </div>  
+            </div>
+            <br>
+        @*<div class="mb-3">
+                <label for="inactivo" class="form-label">Inactivo:</label> 
+                <InputCheckbox id="inactivo" @bind-Value="Empleado.Inactivo" class="form-check-input" /> 
+                <ValidationMessage For="() => Empleado.Inactivo" class="text-danger" /> 
+            </div> *@       
+            <button type="submit" class="btn btn-primary">Crear</button> | <a href="/empleados">Volver al Listado</a>
+        </EditForm>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Empleado Empleado { get; set; } = new();
+    public List<Nacionalidad> Nacionalidades = new List<Nacionalidad>();
+    public List<Religion> Religiones = new List<Religion>();
+    public List<Departamento> Departamentos = new List<Departamento>();
+    public List<AFP> AFP = new List<AFP>();
+    public List<ARS> ARS = new List<ARS>();
+
+    protected override void OnInitialized()
+    {
+        Nacionalidades = BD.Nacionalidad.ToList();
+        Religiones = BD.Religion.ToList();
+        Departamentos = BD.Departamentos.ToList();
+        AFP = BD.AFP.ToList();
+        ARS = BD.ARS.ToList();
+    }
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEmpleado()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Empleado.Add(Empleado);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/empleados");
+    }
+}

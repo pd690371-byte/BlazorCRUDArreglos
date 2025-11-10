@@ -1,0 +1,53 @@
+﻿@page "/ars/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Eliminar ARS</PageTitle>
+
+<p>Está seguro que desea eliminar esta ARS?</p>
+<div>
+   
+    <hr />
+    @if (ars is null)
+    {
+        <p><em>Cargando...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@ars.Nombre</dd>
+        </dl>
+        <EditForm method="post" Model="ars" OnValidSubmit="DeleteARS" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(ars is null)">Eliminar</button> |
+            <a href="/ars">Volver al Listado</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ARS? ars;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ars = await context.ARS.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (ars is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteARS()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ARS.Remove(ars!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/ars");
+    }
+}

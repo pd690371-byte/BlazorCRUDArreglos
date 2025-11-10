@@ -1,0 +1,89 @@
+﻿@page "/personas/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorCRUDArreglos.Modelos
+@inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Editar Personas</PageTitle>
+
+<h1>Editar Persona</h1>
+
+<hr />
+@if (Persona is null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Persona" OnValidSubmit="UpdatePersona" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Persona.Id" value="@Persona.Id" />
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre:</label>
+                    <InputText id="nombre" @bind-Value="Persona.Nombre" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Persona.Nombre" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="apellido" class="form-label">Apellido:</label>
+                    <InputText id="apellido" @bind-Value="Persona.Apellido" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Persona.Apellido" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar</button> | <a href="/personas">Volver al Listado</a>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Persona? Persona { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Persona ??= await context.Personas.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Persona is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdatePersona()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Persona!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PersonaExists(Persona!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/personas");
+    }
+
+    private bool PersonaExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Personas.Any(e => e.Id == id);
+    }
+}
