@@ -5,6 +5,8 @@
 @using BlazorCRUDArreglos.Modelos
 @implements IAsyncDisposable
 @inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@rendermode InteractiveServer
+
 
 <PageTitle>Listado de Profesores</PageTitle>
 
@@ -17,29 +19,39 @@
     </a>
 </p>
 
-<QuickGrid Class="table" Items="context.Profesor">
+<div class="input-group mb-2">
+    <select class="form-select" @bind="columna" style="max-width:120px">
+        <option value="codigo">Código</option>
+        <option value="nombre">Nombre</option>
+        <option value="apellido">Apellido</option>
+    </select>
+    <input type="search" @bind="titleFilter" @bind:event="oninput" class="form-control"
+           style="max-width:300px" placeholder="Criterio de búsqueda" />
+</div>
+
+<QuickGrid Class="table" Items="ItemsFiltrados" Pagination="pagination">
     <PropertyColumn Property="profesor => profesor.Codigo" Sortable="true" Title="Código" />
     <PropertyColumn Property="profesor => profesor.Cedula" Sortable="true" Title="Cédula" />
-    <PropertyColumn Property="profesor => profesor.FechaNacimiento" />
-    <PropertyColumn Property="profesor => profesor.FechaIngreso" />
     <PropertyColumn Property="profesor => profesor.Nombre" />
     <PropertyColumn Property="profesor => profesor.Apellido" />
+    <PropertyColumn Property="profesor => profesor.Telefono" Sortable="true" Title="Teléfono" />
+    <PropertyColumn Property="profesor => profesor.Ocupacion" Sortable="true" Title="Ocupación" /> 
+    @*<PropertyColumn Property="profesor => profesor.Email" />
+    <PropertyColumn Property="profesor => profesor.CategoriaProfesoral" Title="Categoría Profesoral" />
+    <PropertyColumn Property="profesor => profesor.FechaNacimiento" />
+    <PropertyColumn Property="profesor => profesor.FechaIngreso" />    
     <PropertyColumn Property="profesor => profesor.Sexo" />
-    <PropertyColumn Property="profesor => profesor.EstadoCivil" />
-    <PropertyColumn Property="profesor => profesor.Ocupacion" Sortable="true" Title="Ocupación" />
+    <PropertyColumn Property="profesor => profesor.EstadoCivil" />    
     <PropertyColumn Property="profesor => profesor.TipoSangre" />
     <PropertyColumn Property="profesor => profesor.Nacionalidad" />
     <PropertyColumn Property="profesor => profesor.Religion" Sortable="true" Title="Religión" />
-    <PropertyColumn Property="profesor => profesor.Telefono" Sortable="true" Title="Teléfono" />
-    <PropertyColumn Property="profesor => profesor.Email" />
     <PropertyColumn Property="profesor => profesor.Direccion" Sortable="true" Title="Dirección" />
     <PropertyColumn Property="profesor => profesor.Facultad" />
     <PropertyColumn Property="profesor => profesor.TituloCarreraGrado" />
     <PropertyColumn Property="profesor => profesor.GradoAlcanzado" />
-    <PropertyColumn Property="profesor => profesor.CategoriaProfesoral" />
     <PropertyColumn Property="profesor => profesor.FacultadPertenece" />
     <PropertyColumn Property="profesor => profesor.Observaciones" />
-    @*<PropertyColumn Property="profesor => profesor.Inactivo" />*@
+    <PropertyColumn Property="profesor => profesor.Inactivo" />*@
 
     <TemplateColumn Context="profesor">
         <a href="@($"profesors/edit?id={profesor.Id}")">
@@ -55,14 +67,78 @@
         </a>
     </TemplateColumn>
 </QuickGrid>
+<Paginator State="pagination" />
 
 @code {
+    private string titleFilter = string.Empty; //necesario para filtrar el listado.
+
+    private string nameFilter = string.Empty; //la cajita que sale al lado del nombre para filtrar
+    private string columna = string.Empty;
+
+
+
+    //Solo contiene profesores filtrados
+     @*IQueryable<Profesor>? ItemsFiltrados
+     {
+         get
+         {
+             //si escriben en la cajita de arriba
+             if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+
+                 return items?.Where(x => x.Inactivo == false && x.Nombre!.StartsWith(titleFilter));
+             }
+             ///retorna todo sin filtro
+             return items?.Where(x => x.Inactivo == false);
+         }
+    }*@
+
+    IQueryable<Profesor>? ItemsFiltrados
+    {
+        get
+        {
+            //cuando eligen la búsqueda por nombre..
+            if (!string.IsNullOrWhiteSpace(nameFilter))
+                return items?.Where(x => x.Inactivo == false && (x.Nombre!.StartsWith(nameFilter)));
+
+            //si escriben en la cajita de arriba
+            if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+                if (!string.IsNullOrWhiteSpace(columna))
+                {
+                    switch (columna)
+                    {
+                        case "nombre":
+                            return items?.Where(x => x.Inactivo == false && (x.Nombre!.StartsWith(titleFilter)));
+                        case "apellido":
+                            return items?.Where(x => x.Inactivo == false && (x.Apellido!.StartsWith(titleFilter)));
+                        case "codigo":
+                            return items?.Where(x => x.Inactivo == false && (x.Codigo!.StartsWith(titleFilter)));
+                    }
+                }
+                //busca en nombre y apellido, si no hay columna elegida
+                return items?.Where(x => x.Inactivo == false
+                    && (x.Nombre!.StartsWith(titleFilter)) || (x.Apellido!.StartsWith(titleFilter)));
+            }
+
+            ///retorna todo sin filtro
+            return items?.Where(x => x.Inactivo == false);
+        }
+    }
+
+
+
     private AppDBContext context = default!;
 
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    IQueryable<Profesor>? items; //contienen el listado completo de profesores
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        //carga todos los profesores en la bd que estén activos
+        items = context.Profesor.Where(x => x.Inactivo == false).AsQueryable();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
-}
+} 

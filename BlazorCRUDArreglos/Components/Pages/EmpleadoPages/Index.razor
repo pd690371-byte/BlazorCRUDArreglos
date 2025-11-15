@@ -5,6 +5,8 @@
 @using BlazorCRUDArreglos.Modelos
 @implements IAsyncDisposable
 @inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@rendermode InteractiveServer
+
 
 <PageTitle>Listado de Empleados</PageTitle>
 
@@ -17,29 +19,39 @@
     </a>
 </p>
 
-<QuickGrid Class="table" Items="context.Empleado">
+<div class="input-group mb-2">
+    <select class="form-select" @bind="columna" style="max-width:120px">
+        <option value="codigo">Código</option>
+        <option value="nombre">Nombre</option>
+        <option value="apellido">Apellido</option>
+    </select>
+    <input type="search" @bind="titleFilter" @bind:event="oninput" class="form-control"
+           style="max-width:300px" placeholder="Criterio de búsqueda" />
+</div>
+
+<QuickGrid Class="table" Items="ItemsFiltrados" Pagination="pagination">
     <PropertyColumn Property="empleado => empleado.Codigo" Sortable="true" Title="Código" />
     <PropertyColumn Property="empleado => empleado.Cedula" Sortable="true" Title="Cédula" />
-    <PropertyColumn Property="empleado => empleado.FechaNacimiento" />
-    <PropertyColumn Property="empleado => empleado.FechaIngreso" />
     <PropertyColumn Property="empleado => empleado.Nombre" />
     <PropertyColumn Property="empleado => empleado.Apellido" />
+    <PropertyColumn Property="empleado => empleado.Telefono" Sortable="true" Title="Teléfono" />
+    <PropertyColumn Property="empleado => empleado.DepartamentoPertenece" Title="Departamento al que Pertenece" />
+    @*<PropertyColumn Property="empleado => empleado.FechaNacimiento" />
+    <PropertyColumn Property="empleado => empleado.FechaIngreso" />
     <PropertyColumn Property="empleado => empleado.Sexo" />
     <PropertyColumn Property="empleado => empleado.EstadoCivil" />
     <PropertyColumn Property="empleado => empleado.TipoSangre" />
     <PropertyColumn Property="empleado => empleado.Nacionalidad" />
     <PropertyColumn Property="empleado => empleado.Religion" Sortable="true" Title="Religión" />
-    <PropertyColumn Property="empleado => empleado.Telefono" Sortable="true" Title="Teléfono" />
     <PropertyColumn Property="empleado => empleado.Email" />
     <PropertyColumn Property="empleado => empleado.Direccion" Sortable="true" Title="Dirección" />
     <PropertyColumn Property="empleado => empleado.SalarioMensual" />
-    <PropertyColumn Property="empleado => empleado.DepartamentoPertenece" />
     <PropertyColumn Property="empleado => empleado.NombreEmergencia" />
     <PropertyColumn Property="empleado => empleado.TelefonoEmergencia" />
     <PropertyColumn Property="empleado => empleado.AFPPertenece" />
     <PropertyColumn Property="empleado => empleado.ARSPertenece" />
     <PropertyColumn Property="empleado => empleado.Observaciones" />
-    @*<PropertyColumn Property="empleado => empleado.Inactivo" />*@
+    <PropertyColumn Property="empleado => empleado.Inactivo" />*@
 
     <TemplateColumn Context="empleado">
         <a href="@($"empleados/edit?id={empleado.Id}")">
@@ -55,13 +67,74 @@
         </a>
     </TemplateColumn>
 </QuickGrid>
+<Paginator State="pagination" />
 
 @code {
+    private string titleFilter = string.Empty; //necesario para filtrar el listado.
+
+    private string nameFilter = string.Empty; //la cajita que sale al lado del nombre para filtrar
+    private string columna = string.Empty;
+
+
+
+    //Solo contiene profesores filtrados
+    @*IQueryable<Profesor>? ItemsFiltrados
+     {
+         get
+         {
+             //si escriben en la cajita de arriba
+             if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+
+                 return items?.Where(x => x.Inactivo == false && x.Nombre!.StartsWith(titleFilter));
+             }
+             ///retorna todo sin filtro
+             return items?.Where(x => x.Inactivo == false);
+         }
+    }*@
+
+    IQueryable<Empleado>? ItemsFiltrados
+    {
+        get
+        {
+            //cuando eligen la búsqueda por nombre..
+            if (!string.IsNullOrWhiteSpace(nameFilter))
+                return items?.Where(x => x.Inactivo == false && (x.Nombre!.StartsWith(nameFilter)));
+
+            //si escriben en la cajita de arriba
+            if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+                if (!string.IsNullOrWhiteSpace(columna))
+                {
+                    switch (columna)
+                    {
+                        case "nombre":
+                            return items?.Where(x => x.Inactivo == false && (x.Nombre!.StartsWith(titleFilter)));
+                        case "apellido":
+                            return items?.Where(x => x.Inactivo == false && (x.Apellido!.StartsWith(titleFilter)));
+                        case "codigo":
+                            return items?.Where(x => x.Inactivo == false && (x.Codigo!.StartsWith(titleFilter)));
+                    }
+                }
+                //busca en nombre y apellido, si no hay columna elegida
+                return items?.Where(x => x.Inactivo == false
+                    && (x.Nombre!.StartsWith(titleFilter)) || (x.Apellido!.StartsWith(titleFilter)));
+            }
+
+            ///retorna todo sin filtro
+            return items?.Where(x => x.Inactivo == false);
+        }
+    }
     private AppDBContext context = default!;
 
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    IQueryable<Empleado>? items; //contienen el listado completo de empleados
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        //carga todos los empleados en la bd que estén activos
+        items = context.Empleado.Where(x => x.Inactivo == false).AsQueryable();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

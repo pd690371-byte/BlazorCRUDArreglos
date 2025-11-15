@@ -20,8 +20,8 @@ namespace BlazorCRUDArreglos.Modelos
         [DisplayName("Cédula")]
         public string? Cedula { get; set; }
 
-        public DateTime FechaNacimiento { get; set; }
-        public DateTime FechaIngreso { get; set; }
+        public DateTime? FechaNacimiento { get; set; }
+        public DateTime? FechaIngreso { get; set; }
 
         [Required]
         [StringLength(30, ErrorMessage = "30 caracteres máximo.")]
@@ -29,60 +29,60 @@ namespace BlazorCRUDArreglos.Modelos
 
         [Required]
         [StringLength(30, ErrorMessage = "30 caracteres máximo.")]
-        public string Apellido { get; set; }
+        public string? Apellido { get; set; }
 
-        [Required]
+       
         [StringLength(10, ErrorMessage = "10 caracteres máximo.")]
-        public string Sexo { get; set; }
+        public string? Sexo { get; set; }
 
-        [Required]
+        
         [StringLength(15, ErrorMessage = "15 caracteres máximo.")]
-        public string EstadoCivil { get; set; }
+        public string? EstadoCivil { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
         [DisplayName("Ocupación")]
-        public string Ocupacion { get; set; }
+        public string? Ocupacion { get; set; }
 
         [StringLength(5, ErrorMessage = "5 caracteres máximo.")]
-        public string TipoSangre { get; set; }
+        public string? TipoSangre { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string Nacionalidad { get; set; }
+        public string? Nacionalidad { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
         [DisplayName("Religión")]
-        public string Religion { get; set; }
+        public string? Religion { get; set; }
 
         [StringLength(20, ErrorMessage = "20 caracteres máximo.")]
         [DisplayName("Teléfono")]
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [StringLength(100, ErrorMessage = "100 caracteres máximo.")]
         [DisplayName("Dirección")]
-        public string Direccion { get; set; }
+        public string? Direccion { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string Facultad { get; set; }
+        public string? Facultad { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string TituloCarreraGrado { get; set; }
+        public string? TituloCarreraGrado { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string GradoAlcanzado { get; set; }
+        public string? GradoAlcanzado { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string CategoriaProfesoral { get; set; }
+        public string? CategoriaProfesoral { get; set; }
 
         [StringLength(50, ErrorMessage = "50 caracteres máximo.")]
-        public string FacultadPertenece { get; set; }
+        public string? FacultadPertenece { get; set; }
 
         [StringLength(300, ErrorMessage = "300 caracteres máximo.")]
-        public string Observaciones { get; set; }
+        public string? Observaciones { get; set; }
 
-        //public bool Inactivo { get; set; }
+        public bool Inactivo { get; set; }
     }
 }
 

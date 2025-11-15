@@ -5,6 +5,8 @@
 @using BlazorCRUDArreglos.Modelos
 @implements IAsyncDisposable
 @inject IDbContextFactory<BlazorCRUDArreglos.Modelos.AppDBContext> DbFactory
+@rendermode InteractiveServer
+
 
 <PageTitle>Listado de Estudiantes</PageTitle>
 
@@ -14,7 +16,17 @@
     <a href="estudiantes/create">Crear Estudiante</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Estudiante">
+<div class="input-group mb-2">
+    <select class="form-select" @bind="columna" style="max-width:120px">
+        <option value="matricula">Matrícula</option>
+        <option value="nombre">Nombre</option>
+        <option value="apellido">Apellido</option>
+    </select>
+    <input type="search" @bind="titleFilter" @bind:event="oninput" class="form-control"
+           style="max-width:300px" placeholder="Criterio de búsqueda" />
+</div>
+
+<QuickGrid Class="table" Items="ItemsFiltrados" Pagination="pagination">
     <PropertyColumn Property="estudiante => estudiante.Matricula" Sortable="true" Title="Matrícula" />
     <PropertyColumn Property="estudiante => estudiante.Cedula" Sortable="true" Title="Cédula" />
     <PropertyColumn Property="estudiante => estudiante.Nombre" />
@@ -38,11 +50,11 @@
     <PropertyColumn Property="estudiante => estudiante.Inactivo" />*@
 
     <TemplateColumn Context="estudiante">
-        <a href="@($"estudiantes/edit?id={estudiante.Id}")">
+        <a href="@($"estudiantes/edit?id={estudiante.Id}")"> 
             <i class="fa-solid fa-pen-to-square"></i>
         </a>
 
-        <a href="@($"estudiantes/details?id={estudiante.Id}")">
+        <a href="@($"estudiantes/details?id={estudiante.Id}")"> 
             <i class="fa-solid fa-circle-info"></i>
         </a>
 
@@ -51,13 +63,74 @@
         </a>
     </TemplateColumn>
 </QuickGrid>
+<Paginator State="pagination" />
 
 @code {
+    private string titleFilter = string.Empty; //necesario para filtrar el listado.
+
+    private string nameFilter = string.Empty; //la cajita que sale al lado del nombre para filtrar
+    private string columna = string.Empty;
+
+
+
+    //Solo contiene profesores filtrados
+    @*IQueryable<Profesor>? ItemsFiltrados
+     {
+         get
+         {
+             //si escriben en la cajita de arriba
+             if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+
+                 return items?.Where(x => x.Inactivo == false && x.Nombre!.StartsWith(titleFilter));
+             }
+             ///retorna todo sin filtro
+             return items?.Where(x => x.Inactivo == false);
+         }
+    }*@
+
+    IQueryable<Estudiante>? ItemsFiltrados
+    {
+        get
+        {
+            //cuando eligen la búsqueda por nombre..
+            if (!string.IsNullOrWhiteSpace(nameFilter))
+                return items?.Where(x => x.Inactivo == false && (x.Nombre!.StartsWith(nameFilter)));
+
+            //si escriben en la cajita de arriba
+            if (!string.IsNullOrWhiteSpace(titleFilter))
+            {
+                if (!string.IsNullOrWhiteSpace(columna))
+                {
+                    switch (columna)
+                    {
+                        case "nombre":
+                            return items?.Where(x => x.Inactivo == false && (x.Nombre!.StartsWith(titleFilter)));
+                        case "apellido":
+                            return items?.Where(x => x.Inactivo == false && (x.Apellido!.StartsWith(titleFilter)));
+                        case "matricula":
+                            return items?.Where(x => x.Inactivo == false && (x.Matricula!.StartsWith(titleFilter)));
+                    }
+                }
+                //busca en nombre y apellido, si no hay columna elegida
+                return items?.Where(x => x.Inactivo == false
+                    && (x.Nombre!.StartsWith(titleFilter)) || (x.Apellido!.StartsWith(titleFilter)));
+            }
+
+            ///retorna todo sin filtro
+            return items?.Where(x => x.Inactivo == false);
+        }
+    }
     private AppDBContext context = default!;
 
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    IQueryable<Estudiante>? items; //contienen el listado completo de estudiantes
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
+        //carga todos los estudiantes en la bd que estén activos
+        items = context.Estudiante.Where(x => x.Inactivo == false).AsQueryable();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
